@@ -11,7 +11,7 @@ import { Video } from "./pages/Video";
 import { Registration } from "./pages/Registration";
 import { Contact } from "./pages/Contact";
 import { Thankyou } from "./pages/Thankyou";
-import { Payment } from "./pages/Payment";
+// import { Payment } from "./pages/Payment";
 
 export const App = () => {
   return (
@@ -27,7 +27,7 @@ export const App = () => {
         <Route path="/branch-video" element={<Video />} />
         <Route path="/register" element={<Registration />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/payment" element={<Payment/>}/>
+        {/* <Route path="/payment" element={<Payment/>}/> */}
       </Routes>
     </>
   );

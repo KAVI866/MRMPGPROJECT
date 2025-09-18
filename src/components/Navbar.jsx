@@ -13,7 +13,7 @@ const Navbar = () => {
     { path: "/branches", name: "Branches" },
     { path: "/branch-video", name: "Our Branch Videos" },
     { path: "/register", name: "Registration" },
-    {path:"/payment",name:"Payment"},
+    // {path:"/payment",name:"Payment"},
     { path: "/contact", name: "Contact" }
     
   ];
@@ -55,12 +55,12 @@ const filter=navItems.filter(item=>item.name!=='Registration' && item.name!=='Pa
           </Link>
 
           {/* Payment button */}
-           <Link
+           {/* <Link
             to="/payment"
             className="bg-primary text-white px-4 py-2 rounded-full hover:bg-secondary/90 transition"
           >
             Payment
-          </Link>
+          </Link> */}
         </nav>
 
         {/* Mobile Menu Button */}

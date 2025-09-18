@@ -1,488 +1,23 @@
-// import React, { useState } from "react";
-// import { ChevronDown } from "lucide-react";
-// // You'll need to include the assets file in your project or update the image source
-// import { assets } from "../assets/assets"; 
-// import { toast, ToastContainer } from "react-toastify";
-
-// // Styled Select Component
-// const StyledSelect = ({ children, value, onChange }) => (
-//   <div className="relative w-full">
-//     <select
-//       value={value}
-//       onChange={onChange}
-//       className="w-full appearance-none p-3 border rounded-lg bg-white 
-//                  text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary 
-//                  transition shadow-sm"
-//     >
-//       {children}
-//     </select>
-//     <ChevronDown
-//       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
-//     />
-//   </div>
-// );
-
-// export const Registration = () => {
-//   const [step, setStep] = useState(1);
-//   const [loading, setLoading] = useState(false);
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     age: "",
-//     gender: "",
-//     phone: "",
-//     location: "",
-//     email: "",
-//     work: "",
-//     pgLocation: "",
-//     aadhar: null,
-//     photo: null,
-//     plan: "",
-//   });
-//   const [errors, setErrors] = useState({});
-
-//   // ✅ Step 1 Validation (personal data)
-//   const validateStep1 = async () => {
-//     let newErrors = {};
-//     if (formData.name.length <= 2)
-//       newErrors.name = "Name must be more than 2 characters";
-//     if (!formData.age || Number(formData.age) <= 15)
-//       newErrors.age = "Age must be greater than 15";
-//     if (!formData.gender) newErrors.gender = "Please select gender";
-//     if (!/^\d{10}$/.test(formData.phone))
-//       newErrors.phone = "Phone must be 10 digits";
-//     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-//       newErrors.email = "Enter valid email";
-//     if (!formData.location || formData.location.length < 3)
-//       newErrors.location = "Address must be at least 3 characters";
-
-//     setErrors(newErrors);
-//     if (Object.keys(newErrors).length > 0) return false;
-
-//     // 🔗 Backend validation
-//     try {
-//       const res = await fetch("http://localhost:5000/api/v1/user/validate", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//           name: formData.name,
-//           age: Number(formData.age),
-//           gender: formData.gender.toUpperCase(),
-//           phone: formData.phone,
-//           email: formData.email,
-//           location: formData.location,
-//         }),
-//       });
-
-//       const data = await res.json();
-//       if (!res.ok) {
-//         if (data.field) {
-//           setErrors((prev) => ({ ...prev, [data.field]: data.message }));
-//         } else {
-//           toast.error(data.message || "Validation failed");
-//         }
-//         return false;
-//       }
-//       return true;
-//     } catch {
-//       toast.error("Network error, please try again.");
-//       return false;
-//     }
-//   };
-
-//   // ✅ Step 2 Validation (PG + ID)
-//   const validateStep2 = () => {
-//     let newErrors = {};
-//     if (!formData.pgLocation) newErrors.pgLocation = "Select PG location";
-//     if (!formData.work) newErrors.work = "Select work type";
-//     if (!formData.aadhar) newErrors.aadhar = "Upload Aadhar";
-//     if (!formData.photo) newErrors.photo = "Upload photo";
-//     setErrors(newErrors);
-//     return Object.keys(newErrors).length === 0;
-//   };
-
-//   // ✅ Step 3 Validation (plan)
-//   const validateStep3 = () => {
-//     let newErrors = {};
-//     if (!formData.plan) newErrors.plan = "Select plan";
-//     setErrors(newErrors);
-//     return Object.keys(newErrors).length === 0;
-//   };
-
-//   // ✅ Step navigation
-//   const handleNext = async () => {
-//     if (step === 1) {
-//       const valid = await validateStep1();
-//       if (valid) setStep(2);
-//     } else if (step === 2 && validateStep2()) {
-//       setStep(3);
-//     }
-//   };
-
-//   // ✅ Final Submit (registration)
-//   const handleRegister = async () => {
-//     if (!validateStep3()) return;
-
-//     try {
-//       setLoading(true);
-
-//       const formDataToSend = new FormData();
-//       formDataToSend.append("name", formData.name);
-//       formDataToSend.append("age", formData.age);
-//       formDataToSend.append("gender", formData.gender.toUpperCase());
-//       formDataToSend.append("phone", formData.phone);
-//       formDataToSend.append("email", formData.email);
-//       formDataToSend.append("location", formData.location);
-//       formDataToSend.append("work", formData.work);
-//       formDataToSend.append("pgLocation", formData.pgLocation);
-//       formDataToSend.append(
-//         "rentType",
-//         formData.plan === "short" ? "SHORT_TERM" : "LONG_TERM"
-//       );
-
-//       // 🔹 FIX: Map gender to PgType more robustly
-//       const pgTypeMap = {
-//         MALE: "MENS",
-//         FEMALE: "WOMENS",
-//         OTHER: "OTHER",
-//       };
-//       formDataToSend.append("pgType", pgTypeMap[formData.gender.toUpperCase()] || "OTHER");
-
-//       if (formData.photo) formDataToSend.append("profileImage", formData.photo);
-//       if (formData.aadhar) formDataToSend.append("aadharImage", formData.aadhar);
-
-//       const res = await fetch("http://localhost:5000/api/v1/user/register", {
-//         method: "POST",
-//         body: formDataToSend,
-//       });
-
-//       const data = await res.json();
-//       if (res.ok) {
-//         toast.success("Registration successful!");
-//         setTimeout(() => {
-//           window.location.href = "/"; // ✅ redirect on success
-//         }, 2000);
-        
-//       } else {
-//         if (data.field) {
-//           setErrors((prev) => ({ ...prev, [data.field]: data.message }));
-//         } else {
-//           toast.error(data.message || "Something went wrong");
-//         }
-//       }
-//     } catch {
-//       toast.error("Network error, please try again.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <>
-//       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/react-toastify@10.0.5/dist/ReactToastify.min.css" />
-//       <ToastContainer position="top-right" /> 
-//        <div className="max-w-6xl mx-auto p-6 bg-white rounded-2xl shadow-xl grid grid-cols-1 md:grid-cols-2 gap-6">
-      
-//         {/* LEFT FORM */}
-//         <div>
-//           <h2 className="text-3xl font-bold mb-6 text-primary">
-//             Registration Form
-//           </h2>
-
-//           {/* Progress Steps */}
-//           <div className="flex justify-between mb-8">
-//             {["Personal", "ID", "Plan"].map((label, index) => {
-//               const current = index + 1;
-//               return (
-//                 <div key={label} className="flex-1 text-center">
-//                   <span
-//                     className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center mb-2 text-white font-bold 
-//                       ${step >= current ? "bg-primary" : "bg-gray-300"}`}
-//                   >
-//                     {current}
-//                   </span>
-//                   <p
-//                     className={`${
-//                       step === current
-//                         ? "text-primary font-semibold"
-//                         : "text-gray-500"
-//                     }`}
-//                   >
-//                     {label}
-//                   </p>
-//                 </div>
-//               );
-//             })}
-//           </div>
-
-//           {/* STEP 1 */}
-//           {step === 1 && (
-//             <div className="space-y-3">
-//               <input
-//                 type="text"
-//                 placeholder="Enter your name"
-//                 value={formData.name}
-//                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-//                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
-//               />
-//               {errors.name && <p className="text-primary text-sm">{errors.name}</p>}
-
-//               <input
-//                 type="number"
-//                 placeholder="Enter your age"
-//                 value={formData.age}
-//                 onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-//                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
-//               />
-//               {errors.age && <p className="text-primary text-sm">{errors.age}</p>}
-
-//               <input
-//                 type="text"
-//                 placeholder="Enter your address"
-//                 value={formData.location}
-//                 onChange={(e) =>
-//                   setFormData({ ...formData, location: e.target.value })
-//                 }
-//                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
-//               />
-//               {errors.location && (
-//                 <p className="text-primary text-sm">{errors.location}</p>
-//               )}
-
-//               <StyledSelect
-//                 value={formData.gender}
-//                 onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-//               >
-//                 <option value="">Choose Gender</option>
-//                 <option value="MALE">Male</option>
-//                 <option value="FEMALE">Female</option>
-//                 <option value="OTHER">Other</option>
-//               </StyledSelect>
-//               {errors.gender && (
-//                 <p className="text-primary text-sm">{errors.gender}</p>
-//               )}
-
-//               <input
-//                 type="text"
-//                 placeholder="Enter your phone"
-//                 value={formData.phone}
-//                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-//                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
-//               />
-//               {errors.phone && (
-//                 <p className="text-primary text-sm">{errors.phone}</p>
-//               )}
-
-//               <input
-//                 type="email"
-//                 placeholder="Enter your email"
-//                 value={formData.email}
-//                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-//                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
-//               />
-//               {errors.email && (
-//                 <p className="text-primary text-sm">{errors.email}</p>
-//               )}
-
-//               <button
-//                 onClick={handleNext}
-//                 className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary transition"
-//               >
-//                 Next
-//               </button>
-//             </div>
-//           )}
-
-//           {/* STEP 2 */}
-//           {step === 2 && (
-//             <div className="space-y-3">
-//               <StyledSelect
-//                 value={formData.pgLocation}
-//                 onChange={(e) =>
-//                   setFormData({ ...formData, pgLocation: e.target.value })
-//                 }
-//               >
-//                 <option value="">Select PG Location</option>
-//                 <option>Hyderabad</option>
-//                 <option>Bangalore</option>
-//                 <option>Delhi</option>
-//               </StyledSelect>
-//               {errors.pgLocation && (
-//                 <p className="text-primary text-sm">{errors.pgLocation}</p>
-//               )}
-
-//               <StyledSelect
-//                 value={formData.work}
-//                 onChange={(e) => setFormData({ ...formData, work: e.target.value })}
-//               >
-//                 <option value="">Select Work</option>
-//                 <option>IT</option>
-//                 <option>Banking</option>
-//                 <option>Marketing</option>
-//                 <option>Other</option>
-//               </StyledSelect>
-//               {errors.work && <p className="text-primary text-sm">{errors.work}</p>}
-
-//               {/* Aadhar Upload with Preview */}
-//               <div className="grid grid-cols-2 gap-4">
-//                 {/* First row: input fields */}
-//                 <div>
-//                   <input
-//                     type="file"
-//                     accept="image/*"
-//                     onChange={(e) => {
-//                       const file = e.target.files[0];
-//                       if (file && file.size > 5 * 1024 * 1024) {
-//                         toast.error("Aadhar image size cannot exceed 5MB.");
-//                         setFormData({ ...formData, aadhar: null });
-//                         e.target.value = null; // Clear the input field
-//                       } else {
-//                         setFormData({ ...formData, aadhar: file });
-//                       }
-//                     }}
-//                     className="w-full p-3 border rounded-lg bg-white"
-//                     placeholder="Upload Aadhar Image"
-//                   />
-//                   {errors.aadhar && (
-//                     <p className="text-primary text-sm mt-1">{errors.aadhar}</p>
-//                   )}
-//                 </div>
-//                 <div>
-//                   <input
-//                     type="file"
-//                     accept="image/*"
-//                     onChange={(e) => {
-//                       const file = e.target.files[0];
-//                       if (file && file.size > 5 * 1024 * 1024) {
-//                         toast.error("Profile image size cannot exceed 5MB.");
-//                         setFormData({ ...formData, photo: null });
-//                         e.target.value = null; // Clear the input field
-//                       } else {
-//                         setFormData({ ...formData, photo: file });
-//                       }
-//                     }}
-//                     className="w-full p-3 border rounded-lg bg-white"
-//                     placeholder="Upload Profile Image"
-//                   />
-//                   {errors.photo && (
-//                     <p className="text-primary text-sm mt-1">{errors.photo}</p>
-//                   )}
-//                 </div>
-//                 {/* Second row: image previews */}
-//                 <div>
-//                   <div className="w-24 h-24 mx-auto rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden mt-2">
-//                     {formData.aadhar ? (
-//                       <img
-//                         src={URL.createObjectURL(formData.aadhar)}
-//                         alt="Aadhar Preview"
-//                         className="object-cover w-full h-full"
-//                       />
-//                     ) : (
-//                       <span className="text-xs text-gray-400 text-center px-2">Aadhar Image<br/>Preview</span>
-//                     )}
-//                   </div>
-//                 </div>
-//                 <div>
-//                   <div className="w-24 h-24 mx-auto rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden mt-2">
-//                     {formData.photo ? (
-//                       <img
-//                         src={URL.createObjectURL(formData.photo)}
-//                         alt="Profile Preview"
-//                         className="object-cover w-full h-full"
-//                       />
-//                     ) : (
-//                       <span className="text-xs text-gray-400 text-center px-2">Profile Image<br/>Preview</span>
-//                     )}
-//                   </div>
-//                 </div>
-//               </div>
-
-//               <button
-//                 onClick={handleNext}
-//                 className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary transition"
-//               >
-//                 Next
-//               </button>
-//             </div>
-//           )}
-
-//           {/* STEP 3 */}
-//           {step === 3 && (
-//             <div className="space-y-3">
-//               <label className="block p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-//                 <input
-//                   type="radio"
-//                   name="plan"
-//                   value="short"
-//                   checked={formData.plan === "short"}
-//                   onChange={(e) =>
-//                     setFormData({ ...formData, plan: e.target.value })
-//                   }
-//                   className="mr-2"
-//                 />
-//                 Short Term Accommodation
-//               </label>
-
-//               <label className="block p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-//                 <input
-//                   type="radio"
-//                   name="plan"
-//                   value="long"
-//                   checked={formData.plan === "long"}
-//                   onChange={(e) =>
-//                     setFormData({ ...formData, plan: e.target.value })
-//                   }
-//                   className="mr-2"
-//                 />
-//                 Long Term Accommodation
-//               </label>
-//               {errors.plan && <p className="text-primary text-sm">{errors.plan}</p>}
-
-//               <button
-//                 onClick={handleRegister}
-//                 disabled={loading}
-//                 className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 disabled:bg-gray-400"
-//               >
-//                 {loading ? "Submitting..." : "Register"}
-//               </button>
-//             </div>
-//           )}
-//         </div>
-
-//         {/* RIGHT IMAGE */}
-//         <div className="hidden md:block">
-//           <img
-//             src={assets.img9}
-//             alt="Modern PG Room"
-//             className="rounded-2xl shadow-lg h-full object-cover w-full"
-//           />
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { assets } from "../assets/assets";
 import { ChevronDown } from "lucide-react";
-import {assets} from '../assets/assets.js'
-// For this environment, we use a placeholder image as local file imports are not supported.
 import { toast, ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
 
-// Styled Select Component
-const StyledSelect = ({ children, value, onChange }) => (
+const StyledSelect = ({ children, value, onChange, disabled = false }) => (
   <div className="relative w-full">
     <select
       value={value}
       onChange={onChange}
-      className="w-full appearance-none p-3 border rounded-lg bg-white 
-                 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary 
-                 transition shadow-sm"
+      disabled={disabled}
+      className={`w-full appearance-none p-3 border rounded-lg bg-white text-gray-700 
+                 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm 
+                 ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
     >
       {children}
     </select>
-    <ChevronDown
-      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
-    />
+    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
   </div>
 );
 
@@ -491,59 +26,89 @@ export const Registration = () => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    age: "",
+    dob: "",
     gender: "",
     phone: "",
     location: "",
     email: "",
     work: "",
+    pgType: "",
     pgLocation: "",
-    aadhar: null,
+    documentType: "",
+    document: null,
     photo: null,
     plan: "",
+    toDate: "",
   });
   const [errors, setErrors] = useState({});
+  const [pgLocations, setPgLocations] = useState([]);
+  const [age, setAge] = useState(null);
+  const navigate = useNavigate();
 
-  // ✅ Step 1 Validation (personal data)
+  // 🔹 Calculate age
+  const calculateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let a = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      a--;
+    }
+    return a;
+  };
+
+  useEffect(() => {
+    if (formData.dob) setAge(calculateAge(formData.dob));
+    else setAge(null);
+  }, [formData.dob]);
+
+  // 🔹 Auto-set pgType based on gender
+  useEffect(() => {
+    if (formData.gender === "MALE") {
+      setFormData((prev) => ({ ...prev, pgType: "MENS" }));
+    } else if (formData.gender === "FEMALE") {
+      setFormData((prev) => ({ ...prev, pgType: "WOMENS" }));
+    }
+  }, [formData.gender]);
+
+  // 🔹 Fetch PG locations when pgType changes
+  useEffect(() => {
+    if (formData.pgType) {
+      fetch(`http://localhost:5000/api/v1/filters/pg-locations?pgType=${formData.pgType}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) setPgLocations(data.data.options);
+          else setPgLocations([]);
+        })
+        .catch(() => setPgLocations([]));
+    }
+  }, [formData.pgType]);
+
+  // 🔹 Step 1 Validation
   const validateStep1 = async () => {
-    let newErrors = {};
-    if (formData.name.length <= 2)
-      newErrors.name = "Name must be more than 2 characters";
-    if (!formData.age || Number(formData.age) <= 15)
-      newErrors.age = "Age must be greater than 15";
-    if (!formData.gender) newErrors.gender = "Please select gender";
-    if (!/^\d{10}$/.test(formData.phone))
-      newErrors.phone = "Phone must be 10 digits";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      newErrors.email = "Enter valid email";
-    if (!formData.location || formData.location.length < 3)
-      newErrors.location = "Address must be at least 3 characters";
+    if (!formData.name.trim()) return toast.error("Name is required"), false;
+    if (!formData.dob) return toast.error("Date of birth is required"), false;
+    if (age <= 15) return toast.error("Age must be greater than 15"), false;
+    if (!/^\d{10}$/.test(formData.phone)) return toast.error("Phone must be 10 digits"), false;
+    if (!formData.email.trim()) return toast.error("Email is required"), false;
+    if (!formData.location.trim()) return toast.error("Address is required"), false;
 
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return false;
-
-    // 🔗 Backend validation
     try {
-      const res = await fetch("http://localhost:5000/api/v1/user/validate", {
+      const res = await fetch("http://localhost:5000/api/v1/register/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
-          age: Number(formData.age),
-          gender: formData.gender.toUpperCase(),
+          age,
+          gender: formData.gender,
           phone: formData.phone,
           email: formData.email,
           location: formData.location,
         }),
       });
-
       const data = await res.json();
       if (!res.ok) {
-        if (data.field) {
-          setErrors((prev) => ({ ...prev, [data.field]: data.message }));
-        } else {
-          toast.error(data.message || "Validation failed");
-        }
+        toast.error(data.message || "Validation failed");
         return false;
       }
       return true;
@@ -553,370 +118,217 @@ export const Registration = () => {
     }
   };
 
-  // ✅ Step 2 Validation (PG + ID)
+  // 🔹 Step 2 Validation
   const validateStep2 = () => {
     let newErrors = {};
     if (!formData.pgLocation) newErrors.pgLocation = "Select PG location";
-    if (!formData.work) newErrors.work = "Select work type";
-    if (!formData.aadhar) newErrors.aadhar = "Upload Aadhar";
-    if (!formData.photo) newErrors.photo = "Upload photo";
+    if (!formData.work) newErrors.work = "Select work";
+    if (!formData.documentType) newErrors.documentType = "Select document type";
+    if (!formData.document) newErrors.document = "Upload document";
+    if (!formData.photo) newErrors.photo = "Upload profile photo";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // ✅ Step 3 Validation (plan)
+  // 🔹 Step 3 Validation
   const validateStep3 = () => {
     let newErrors = {};
     if (!formData.plan) newErrors.plan = "Select plan";
+    if (formData.plan === "short" && !formData.toDate) newErrors.toDate = "Select to date";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // ✅ Step navigation
   const handleNext = async () => {
-    if (step === 1) {
-      const valid = await validateStep1();
-      if (valid) setStep(2);
-    } else if (step === 2 && validateStep2()) {
-      setStep(3);
-    }
+    if (step === 1 && (await validateStep1())) setStep(2);
+    else if (step === 2 && validateStep2()) setStep(3);
   };
 
-  // ✅ Final Submit (registration)
   const handleRegister = async () => {
     if (!validateStep3()) return;
 
     try {
       setLoading(true);
+      const fd = new FormData();
+      Object.entries({
+        name: formData.name,
+        dob: formData.dob,
+        gender: formData.gender,
+        phone: formData.phone,
+        email: formData.email,
+        location: formData.location,
+        work: formData.work,
+        pgType: formData.pgType,
+        pgLocation: formData.pgLocation,
+        rentType: formData.plan === "short" ? "SHORT_TERM" : "LONG_TERM",
+      }).forEach(([key, val]) => fd.append(key, val));
 
-      const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("age", formData.age);
-      formDataToSend.append("gender", formData.gender.toUpperCase());
-      formDataToSend.append("phone", formData.phone);
-      formDataToSend.append("email", formData.email);
-      formDataToSend.append("location", formData.location);
-      formDataToSend.append("work", formData.work);
-      formDataToSend.append("pgLocation", formData.pgLocation);
-      formDataToSend.append(
-        "rentType",
-        formData.plan === "short" ? "SHORT_TERM" : "LONG_TERM"
-      );
+      if (formData.plan === "short") fd.append("dateOfRelieving", formData.toDate);
+      if (formData.photo) fd.append("profileImage", formData.photo);
+      if (formData.document) fd.append("documentImage", formData.document);
 
-      // 🔹 FIX: Map gender to PgType more robustly
-      const pgTypeMap = {
-        MALE: "MENS",
-        FEMALE: "WOMENS",
-        OTHER: "OTHER",
-      };
-      formDataToSend.append("pgType", pgTypeMap[formData.gender.toUpperCase()] || "OTHER");
-
-      if (formData.photo) formDataToSend.append("profileImage", formData.photo);
-      if (formData.aadhar) formDataToSend.append("aadharImage", formData.aadhar);
-
-      const res = await fetch("http://localhost:5000/api/v1/user/register", {
+      const res = await fetch("http://localhost:5000/api/v1/register", {
         method: "POST",
-        body: formDataToSend,
+        body: fd,
       });
-
       const data = await res.json();
+
       if (res.ok) {
-        toast.success("Registration successful!");
-        setTimeout(() => {
-          window.location.href = "/"; // ✅ redirect on success
-        }, 2000);
+        toast.success("Registration completed!");
+        setTimeout(() => navigate("/"), 2000);
       } else {
-        if (data.field) {
-          setErrors((prev) => ({ ...prev, [data.field]: data.message }));
-        } else {
-          toast.error(data.message || "Something went wrong");
-        }
+        toast.error(data.message || "Something went wrong");
       }
     } catch {
-      toast.error("Network error, please try again.");
+      toast.error("Network error");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleFileChange = (field, file) => {
+    if (file && file.size > 2 * 1024 * 1024) {
+      toast.error("File size must be less than 2MB");
+      return;
+    }
+    setFormData({ ...formData, [field]: file });
+  };
+
   return (
     <>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/react-toastify@10.0.5/dist/ReactToastify.min.css" />
-      <ToastContainer position="top-right" /> 
-      <div className="max-w-6xl mx-auto p-6 bg-white rounded-2xl shadow-xl grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* LEFT FORM */}
-        <div>
-          <h2 className="text-3xl font-bold mb-6 text-primary">
-            Registration Form
-          </h2>
-
-          {/* Progress Steps */}
+      <ToastContainer position="top-right" />
+      <div className="bg-white rounded-2xl shadow-lg grid grid-cols-2 gap-6">
+        {/* Left Side - Form */}
+        <div className="w-screen mt-5 px-5 md:w-auto">
+          {/* Progress */}
           <div className="flex justify-between mb-8">
-            {["Personal", "ID", "Plan"].map((label, index) => {
-              const current = index + 1;
-              return (
-                <div key={label} className="flex-1 text-center">
-                  <span
-                    className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center mb-2 text-white font-bold 
-                      ${step >= current ? "bg-primary" : "bg-gray-300"}`}
-                  >
-                    {current}
-                  </span>
-                  <p
-                    className={`${
-                      step === current
-                        ? "text-primary font-semibold"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    {label}
-                  </p>
-                </div>
-              );
-            })}
+            {["Personal", "ID & PG", "Plan"].map((label, idx) => (
+              <div key={label} className="flex-1 text-center">
+                <span
+                  className={`w-10 h-10 mx-auto flex items-center justify-center rounded-full mb-2 text-white 
+                  ${step >= idx + 1 ? "bg-secondary" : "bg-gray-400"}`}
+                >
+                  {idx + 1}
+                </span>
+                <p className={step === idx + 1 ? "text-primary font-semibold" : "text-gray-500"}>{label}</p>
+              </div>
+            ))}
           </div>
 
-          {/* STEP 1 */}
+          {/* Step 1 */}
           {step === 1 && (
             <div className="space-y-3">
-              <input
-                type="text"
-                placeholder="Enter your name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
-              />
-              {errors.name && <p className="text-primary text-sm">{errors.name}</p>}
+              <input type="text" placeholder="Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full p-3 border rounded-lg" />
+              <input type="date" placeholder="Date of Birth" value={formData.dob} onChange={(e) => setFormData({ ...formData, dob: e.target.value })} className="w-full p-3 border rounded-lg" />
+              {age !== null && <p className={`text-sm ${age <= 15 ? "text-red-500" : "text-gray-600"}`}>Age: <span className="font-semibold">{age}</span> years</p>}
 
-              <input
-                type="number"
-                placeholder="Enter your age"
-                value={formData.age}
-                onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
-              />
-              {errors.age && <p className="text-primary text-sm">{errors.age}</p>}
-
-              <input
-                type="text"
-                placeholder="Enter your address"
-                value={formData.location}
-                onChange={(e) =>
-                  setFormData({ ...formData, location: e.target.value })
-                }
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
-              />
-              {errors.location && (
-                <p className="text-primary text-sm">{errors.location}</p>
-              )}
-
-              <StyledSelect
-                value={formData.gender}
-                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-              >
-                <option value="">Choose Gender</option>
+              <StyledSelect value={formData.gender} onChange={(e) => setFormData({ ...formData, gender: e.target.value })}>
+                <option value="">Select Gender</option>
                 <option value="MALE">Male</option>
                 <option value="FEMALE">Female</option>
-                <option value="OTHER">Other</option>
               </StyledSelect>
-              {errors.gender && (
-                <p className="text-primary text-sm">{errors.gender}</p>
-              )}
 
-              <input
-                type="text"
-                placeholder="Enter your phone"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
-              />
-              {errors.phone && (
-                <p className="text-primary text-sm">{errors.phone}</p>
-              )}
+              <input type="text" placeholder="Phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full p-3 border rounded-lg" />
+              <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full p-3 border rounded-lg" />
+              <input type="text" placeholder="Address" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="w-full p-3 border rounded-lg" />
 
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary"
-              />
-              {errors.email && (
-                <p className="text-primary text-sm">{errors.email}</p>
-              )}
-
-              <button
-                onClick={handleNext}
-                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary transition"
-              >
-                Next
-              </button>
+              <button onClick={handleNext} disabled={age !== null && age <= 15} className={`w-full py-3 rounded-lg text-white ${age !== null && age <= 15 ? "bg-gray-400 cursor-not-allowed" : "bg-primary hover:bg-secondary cursor-pointer"}`}>Next</button>
             </div>
           )}
 
-          {/* STEP 2 */}
+          {/* Step 2 */}
           {step === 2 && (
-            <div className="space-y-3">
-              <StyledSelect
-                value={formData.pgLocation}
-                onChange={(e) =>
-                  setFormData({ ...formData, pgLocation: e.target.value })
-                }
-              >
+            <div className="space-y-4">
+              <StyledSelect value={formData.pgType} disabled>
+                <option value="MENS">Mens</option>
+                <option value="WOMENS">Womens</option>
+              </StyledSelect>
+
+              <StyledSelect value={formData.pgLocation} onChange={(e) => setFormData({ ...formData, pgLocation: e.target.value })}>
                 <option value="">Select PG Location</option>
-                <option>Hyderabad</option>
-                <option>Bangalore</option>
-                <option>Delhi</option>
+                {pgLocations.map((pg) => (
+                  <option key={pg.value} value={pg.value}>{pg.label} ({pg.pgName})</option>
+                ))}
               </StyledSelect>
-              {errors.pgLocation && (
-                <p className="text-primary text-sm">{errors.pgLocation}</p>
-              )}
+              {errors.pgLocation && <p className="text-red-500">{errors.pgLocation}</p>}
 
-              <StyledSelect
-                value={formData.work}
-                onChange={(e) => setFormData({ ...formData, work: e.target.value })}
-              >
-                <option value="">Select Work</option>
-                <option>IT</option>
-                <option>Banking</option>
-                <option>Marketing</option>
-                <option>Other</option>
+              <StyledSelect value={formData.work} onChange={(e) => setFormData({ ...formData, work: e.target.value })}>
+                <option value="">Select Work Type</option>
+                <option value="IT">IT</option>
+                <option value="ENG">ENG</option>
+                <option value="BANKING">BANKING</option>
               </StyledSelect>
-              {errors.work && <p className="text-primary text-sm">{errors.work}</p>}
+              {errors.work && <p className="text-red-500">{errors.work}</p>}
 
-              {/* Aadhar Upload with Preview */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* First row: input fields */}
-                <div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file && file.size > 5 * 1024 * 1024) {
-                        toast.error("Aadhar image size cannot exceed 5MB.");
-                        setFormData({ ...formData, aadhar: null });
-                        e.target.value = null; // Clear the input field
-                      } else {
-                        setFormData({ ...formData, aadhar: file });
-                      }
-                    }}
-                    className="w-full p-3 border rounded-lg bg-white"
-                    placeholder="Upload Aadhar Image"
-                  />
-                  {errors.aadhar && (
-                    <p className="text-primary text-sm mt-1">{errors.aadhar}</p>
-                  )}
+              <StyledSelect value={formData.documentType} onChange={(e) => setFormData({ ...formData, documentType: e.target.value })}>
+                <option value="">Select Document Type</option>
+                <option value="AADHAR">Aadhar</option>
+                <option value="PAN">PAN</option>
+              </StyledSelect>
+              {errors.documentType && <p className="text-red-500">{errors.documentType}</p>}
+
+              {/* File Uploads */}
+              <div className="flex items-center gap-6">
+                <div className="flex-1">
+                  <label className="block text-sm">{formData.documentType ? `Upload ${formData.documentType}` : "Upload Document"}</label>
+                  <input type="file" accept="image/*" onChange={(e) => handleFileChange("document", e.target.files?.[0] || null)} className="w-full p-3 border rounded-lg" />
                 </div>
-                <div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file && file.size > 5 * 1024 * 1024) {
-                        toast.error("Profile image size cannot exceed 5MB.");
-                        setFormData({ ...formData, photo: null });
-                        e.target.value = null; // Clear the input field
-                      } else {
-                        setFormData({ ...formData, photo: file });
-                      }
-                    }}
-                    className="w-full p-3 border rounded-lg bg-white"
-                    placeholder="Upload Profile Image"
-                  />
-                  {errors.photo && (
-                    <p className="text-primary text-sm mt-1">{errors.photo}</p>
-                  )}
-                </div>
-                {/* Second row: image previews */}
-                <div>
-                  <div className="w-24 h-24 mx-auto rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden mt-2">
-                    {formData.aadhar ? (
-                      <img
-                        src={URL.createObjectURL(formData.aadhar)}
-                        alt="Aadhar Preview"
-                        className="object-cover w-full h-full"
-                      />
-                    ) : (
-                      <span className="text-xs text-gray-400 text-center px-2">Aadhar Image<br/>Preview</span>
-                    )}
+                {formData.document && (
+                  <div className="flex justify-center items-center w-32 h-32 border rounded-lg bg-gray-50">
+                    <img src={URL.createObjectURL(formData.document)} alt="Doc Preview" className="max-h-28 object-contain" />
                   </div>
-                </div>
-                <div>
-                  <div className="w-24 h-24 mx-auto rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden mt-2">
-                    {formData.photo ? (
-                      <img
-                        src={URL.createObjectURL(formData.photo)}
-                        alt="Profile Preview"
-                        className="object-cover w-full h-full"
-                      />
-                    ) : (
-                      <span className="text-xs text-gray-400 text-center px-2">Profile Image<br/>Preview</span>
-                    )}
-                  </div>
-                </div>
+                )}
               </div>
+              {errors.document && <p className="text-red-500">{errors.document}</p>}
 
-              <button
-                onClick={handleNext}
-                className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary transition"
-              >
-                Next
-              </button>
+              <div className="flex items-center gap-6">
+                <div className="flex-1">
+                  <label className="block text-sm">Upload Profile Photo</label>
+                  <input type="file" accept="image/*" onChange={(e) => handleFileChange("photo", e.target.files?.[0] || null)} className="w-full p-3 border rounded-lg" />
+                </div>
+                {formData.photo && (
+                  <div className="flex justify-center items-center w-32 h-32 border rounded-lg bg-gray-50">
+                    <img src={URL.createObjectURL(formData.photo)} alt="Profile Preview" className="max-h-28 object-contain" />
+                  </div>
+                )}
+              </div>
+              {errors.photo && <p className="text-red-500">{errors.photo}</p>}
+
+              <button onClick={handleNext} className="w-full bg-primary hover:bg-secondary text-white py-3 rounded-lg">Next</button>
             </div>
           )}
 
-          {/* STEP 3 */}
+          {/* Step 3 */}
           {step === 3 && (
-            <div className="space-y-3">
-              <label className="block p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name="plan"
-                  value="short"
-                  checked={formData.plan === "short"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, plan: e.target.value })
-                  }
-                  className="mr-2"
-                />
-                Short Term Accommodation
+            <div className="space-y-4">
+              <label className="block p-3 border rounded-lg">
+                <input type="radio" name="plan" value="short" checked={formData.plan === "short"} onChange={(e) => setFormData({ ...formData, plan: e.target.value })} /> Short Term
               </label>
 
-              <label className="block p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name="plan"
-                  value="long"
-                  checked={formData.plan === "long"}
-                  onChange={(e) =>
-                    setFormData({ ...formData, plan: e.target.value })
-                  }
-                  className="mr-2"
-                />
-                Long Term Accommodation
-              </label>
-              {errors.plan && <p className="text-primary text-sm">{errors.plan}</p>}
+              {formData.plan === "short" && (
+                <div>
+                  <label>Date Of Relieving</label>
+                  <input type="date" value={formData.toDate} onChange={(e) => setFormData({ ...formData, toDate: e.target.value })} className="p-3 border rounded-lg w-full" />
+                  {errors.toDate && <p className="text-red-500">{errors.toDate}</p>}
+                </div>
+              )}
 
-              <button
-                onClick={handleRegister}
-                disabled={loading}
-                className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 disabled:bg-gray-400"
-              >
+              <label className="block p-3 border rounded-lg">
+                <input type="radio" name="plan" value="long" checked={formData.plan === "long"} onChange={(e) => setFormData({ ...formData, plan: e.target.value })} /> Long Term
+              </label>
+
+              {errors.plan && <p className="text-red-500">{errors.plan}</p>}
+
+              <button onClick={handleRegister} disabled={loading} className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg">
                 {loading ? "Submitting..." : "Register"}
               </button>
             </div>
           )}
         </div>
 
-        {/* RIGHT IMAGE */}
-        <div className="hidden md:block">
-          <img
-            src={assets.img9}
-            alt="Modern PG Room"
-            className="rounded-2xl shadow-lg h-full object-cover w-full"
-          />
+        {/* Right Side - Image */}
+        <div className="hidden md:flex justify-center items-center">
+          <img src={assets.img10} alt="Registration Illustration" className="rounded-xl shadow-lg" />
         </div>
       </div>
     </>
