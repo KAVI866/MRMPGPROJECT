@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin } from "lucide-react";
 import { assets } from '../assets/assets';
+import { backendUrl } from '../App';
 
 const ToastNotification = ({ message, type, onClose }) => {
   const bgColor = type === "success" ? "bg-green-500" : "bg-red-500";
@@ -114,7 +115,7 @@ export const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/v1/enquiry', {
+      const response = await fetch(backendUrl+'/enquiry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

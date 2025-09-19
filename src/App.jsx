@@ -12,7 +12,7 @@ import { Registration } from "./pages/Registration";
 import { Contact } from "./pages/Contact";
 import { Thankyou } from "./pages/Thankyou";
 // import { Payment } from "./pages/Payment";
-
+export const backendUrl=import.meta.env.BACKEND_URL;
 export const App = () => {
   return (
     <>

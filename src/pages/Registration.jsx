@@ -4,6 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
+import { backendUrl } from "../App";
 
 const StyledSelect = ({ children, value, onChange, disabled = false }) => (
   <div className="relative w-full">
@@ -74,7 +75,7 @@ export const Registration = () => {
   // 🔹 Fetch PG locations when pgType changes
   useEffect(() => {
     if (formData.pgType) {
-      fetch(`http://localhost:5000/api/v1/filters/pg-locations?pgType=${formData.pgType}`)
+      fetch(backendUrl+`/filters/pg-locations?pgType=${formData.pgType}`)
         .then((res) => res.json())
         .then((data) => {
           if (data.success) setPgLocations(data.data.options);
@@ -94,7 +95,7 @@ export const Registration = () => {
     if (!formData.location.trim()) return toast.error("Address is required"), false;
 
     try {
-      const res = await fetch("http://localhost:5000/api/v1/register/validate", {
+      const res = await fetch(backendUrl+"/register/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -167,7 +168,7 @@ export const Registration = () => {
       if (formData.photo) fd.append("profileImage", formData.photo);
       if (formData.document) fd.append("documentImage", formData.document);
 
-      const res = await fetch("http://localhost:5000/api/v1/register", {
+      const res = await fetch(backendUrl+"/register", {
         method: "POST",
         body: fd,
       });
