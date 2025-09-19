@@ -95,6 +95,7 @@ export const Registration = () => {
     if (!formData.location.trim()) return toast.error("Address is required"), false;
 
     try {
+      console.log(backendUrl);
       const res = await fetch(backendUrl+"/register/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
