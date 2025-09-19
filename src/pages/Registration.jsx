@@ -95,13 +95,12 @@ export const Registration = () => {
     if (!formData.location.trim()) return toast.error("Address is required"), false;
 
     try {
-      console.log(backendUrl);
       const res = await fetch(backendUrl+"/register/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
-          age,
+          dob: formData.dob,
           gender: formData.gender,
           phone: formData.phone,
           email: formData.email,
